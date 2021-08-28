@@ -98,7 +98,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Exercise1() {
-    console.log("hola")
     const classes = useStyles();
     const stuff = [1, 2, 3, 4, 5, 6, 6, 6, 6, 6]
     const initialState = [
