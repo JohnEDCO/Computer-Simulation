@@ -99,10 +99,10 @@ const useStyles = makeStyles((theme) => ({
 
 function Exercise2() {
     const classes = useStyles();
-    const stuff = ["cara", "sello"]
+    const stuff = ["Face", "Stamp"]
     const initialState = [
-        ["cara", 0],
-        ["sello", 0],
+        ["Face", 0],
+        ["Stamp", 0],
     ]
     const [frequency, setFrequency] = useState(0)
     const [generateBool, setGenerateBool] = useState(false)
@@ -112,10 +112,10 @@ function Exercise2() {
 
     const saveReleases = (key) => {
         switch (key) {
-            case "cara":
+            case "Face":
                 setDatos([...datos, datos[0][1] += 1])
                 break;
-            case "sello":
+            case "Stamp":
                 setDatos([...datos, datos[1][1] += 1])
                 break;
             default:
@@ -160,7 +160,7 @@ function Exercise2() {
             <Container style={{ flexDirection: "row", flex: "wrap", marginTop: 20, textAlign: "center" }}>
                 <TextField
                     id="outlined-basic"
-                    label="Frequency"
+                    label="Attempts"
                     variant="outlined"
                     type="number"
                     onChange={(event) => { setFrequency(event.target.value) }}
@@ -189,9 +189,9 @@ function Exercise2() {
                         <Grid item xs={2} className={classes.grid}>
                             <Paper className={classes.paper}>Options</Paper>
                             {<>
-                                <h2>Cara</h2>
+                                <h2>Face</h2>
                                 <Divider />
-                                <h2>Sello</h2>
+                                <h2>Stamp</h2>
                                 <Divider />
                             </>
                             }
