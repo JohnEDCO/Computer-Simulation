@@ -111,7 +111,9 @@ const useStyles = makeStyles((theme) => ({
 
 function Exercise4() {
     const classes = useStyles();
-    const initialState = []
+    const cola2 = []
+    const [cola, setCola] = useState([])
+
     const [frequency, setFrequency] = useState(0)
     const [generateBool, setGenerateBool] = useState(false)
     const [open, setOpen] = useState(false)
@@ -144,23 +146,33 @@ function Exercise4() {
     const timeTicket = () => {
         let segundosPersons = 0
         let segundos = 0
+        let conteo = 0
         for (let i = 0; i < frequency; i++) {
-            if(i>0){
-                segundosPersons+=generateRandomPersons()
+            if (i > 0) {
+                segundosPersons += generateRandomPersons()
             }
             segundos += generateRandom()
-            if(segundosPersons<segundos){
-                console.log("hay una cola de ", i, " personas")
-                console.log("se atendio el ",i ," en", segundos)
-                console.log("------------------------------------")
+            if (segundosPersons < segundos) {
+                conteo++
+                console.log("i->", i)
+            } else {
+                if (conteo !== 0 && conteo !== 1) {
+                    console.log("Push--->", conteo)
+
+                    cola.push(conteo)
+                }
+                console.log("no->", i)
+                conteo = 0
             }
         }
-        let promedio = segundos/frequency
+
+        let promedio = segundos / frequency
         setTimeTick(convertSeconds(segundos))
         setTimeProm(convertSeconds(promedio))
         console.log("tiempo--> ", convertSeconds(segundos), segundos)
         console.log("Promedio--> ", convertSeconds(promedio), promedio)
         console.log("En ", convertSeconds(segundosPersons), " Entraron ", frequency, " personas")
+        console.log("hubo una cola de ", conteo, " personas", cola)
     }
 
     return (
@@ -217,6 +229,7 @@ function Exercise4() {
                             setOpen(!open)
                             setTimeTick(0)
                             setTimeProm(0)
+                            setCola([])
                         }}>
                         Clean
                     </Button>
@@ -257,6 +270,28 @@ function Exercise4() {
                                 <Divider />
                             </>
 
+                        }
+                    </Grid>
+                    <Divider orientation="vertical" flexItem />
+                    <Grid item xs={3}>
+                        <Paper className={classes.paper}>Queue Size</Paper>
+
+                        {(generateBool && cola.length !== 0) ?
+
+                            Object.keys(cola).map(key => {
+
+                                return (
+                                    <>
+                                        <h2 key={key}>{cola[key]}</h2>
+                                        <Divider />
+                                    </>
+                                )
+                            })
+                            :
+                            <>
+                                <h2>0</h2>
+                                <Divider />
+                            </>
                         }
                     </Grid>
                 </Grid>
