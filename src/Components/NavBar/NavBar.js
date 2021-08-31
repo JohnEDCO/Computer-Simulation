@@ -4,7 +4,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import { Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     margin: 12,
     fontSize: 12
   },
-  buttonsHome:{
+  buttonsHome: {
     textDecoration: "none",
     color: "black",
     margin: 12,
@@ -33,25 +33,33 @@ const useStyles = makeStyles((theme) => ({
 function NavBar() {
   const classes = useStyles();
   return (
-      <AppBar position="relative" style={{background:"#232121"}}>
-        <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            Computer Simulation Exercises
-          </Typography>
+    <AppBar position="relative" style={{ background: "#232121" }}>
+      <Toolbar>
+        <Typography variant="h6" className={classes.title}>
+          Computer Simulation Exercises
+        </Typography>
+        <Link className={classes.links} to='/Exercise1'>
           <Button color="inherit">
-            <Link className={classes.links} to='/Exercise1'>Exercise 1</Link>
+            Exercise 1
           </Button>
+        </Link>
+        <Link className={classes.links} to='/Exercise2'>
           <Button color="inherit">
-            <Link className={classes.links} to='/Exercise2'> Exercise 2</Link>
+            Exercise 2
           </Button>
+        </Link>
+        <Link className={classes.links} to='/Exercise3'>
           <Button color="inherit">
-            <Link className={classes.links} to='/Exercise3'> Exercise 3</Link>
+            Exercise 3
           </Button>
+        </Link>
+        <Link className={classes.links} to='/Exercise4'>
           <Button color="inherit">
-            <Link className={classes.links} to='/Exercise4'> Exercise 4</Link>
+            Exercise 4
           </Button>
-        </Toolbar>
-      </AppBar>
+        </Link>
+      </Toolbar>
+    </AppBar >
   )
 }
 

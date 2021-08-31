@@ -109,6 +109,7 @@ function Exercise2() {
     const [datos, setDatos] = useState(initialState)
     const [open, setOpen] = useState(false)
     const [openDialog, setOpenDialog] = useState(false)
+    const [disabled, setDisabled] = useState(false)
 
     const saveReleases = (key) => {
         switch (key) {
@@ -129,12 +130,14 @@ function Exercise2() {
     }
 
     const generateFrequency = (frequency) => {
-        setOpenDialog(true)
+        setDatos(initialState)
+
         for (let i = 1; i < frequency + 1; i++) {
             let moneda = loadCurrency()
             saveReleases(moneda)
         }
         console.log("Lanzamientos-->", datos)
+        setOpenDialog(true)
 
     }
 
@@ -142,10 +145,10 @@ function Exercise2() {
         <>
             <Dialog onClose={() => setOpenDialog(false)} aria-labelledby="simple-dialog-title" open={openDialog} style={{ width: "100%", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
                 <DialogTitle id="simple-dialog-title" >
-                    {   
-                        Math.abs(datos[0][1]-datos[1][1]) >=3?
-                        "Felicitaciones usted ha ganado $8 dolares"
-                        :"Lo siento debe pagar $"+frequency+" dolares"
+                    {
+                        Math.abs(datos[0][1] - datos[1][1]) >= 3 ?
+                            "Felicitaciones usted ha ganado $8 dolares"
+                            : "Lo siento debe pagar $" + frequency + " dolares"
                     }
                 </DialogTitle>
                 <Button color="inherit"
@@ -166,10 +169,13 @@ function Exercise2() {
                     onChange={(event) => { setFrequency(event.target.value) }}
                 />
                 <Button color="inherit"
+                    disabled ={disabled}
                     className={classes.buttons}
                     onClick={() => {
                         setGenerateBool(true)
                         generateFrequency(parseInt(frequency))
+                        setDisabled(true)
+
                     }}>
                     Throw Dice
                 </Button>
@@ -179,62 +185,63 @@ function Exercise2() {
                         setDatos(initialState)
                         setGenerateBool(false)
                         setOpen(!open)
+                        setDisabled(false)
                     }}>
                     Clean
                 </Button>
             </Container>
 
             {generateBool &&
-                    <Grid container spacing={2} className={classes.containerResults}>
-                        <Grid item xs={2} className={classes.grid}>
-                            <Paper className={classes.paper}>Options</Paper>
-                            {<>
-                                <h2>Face</h2>
-                                <Divider />
-                                <h2>Stamp</h2>
-                                <Divider />
-                            </>
-                            }
-                        </Grid>
-                        <Divider orientation="vertical" flexItem />
-
-                        <Grid item xs={2} className={classes.grid}>
-                            <Paper className={classes.paper}>Frequency</Paper>
-                            {
-                                Object.keys(datos).map(key => {
-                                    if (!isNaN(datos[key][1] / frequency)) {
-                                        return (
-                                            <>
-                                                <h2>{datos[key][1]}</h2>
-                                                <Divider />
-                                            </>
-
-                                        )
-                                    }
-
-                                })
-                            }
-                        </Grid>
-                        <Divider orientation="vertical" flexItem />
-                        <Grid item xs={2}>
-                            <Paper className={classes.paper}>Probability</Paper>
-
-                            {
-                                Object.keys(datos).map(key => {
-                                    if (!isNaN(datos[key][1] / frequency)) {
-                                        return (
-                                            <>
-                                                <h2>{datos[key][1] / frequency}</h2>
-                                                <Divider />
-                                            </>
-
-                                        )
-                                    }
-
-                                })
-                            }
-                        </Grid>
+                <Grid container spacing={2} className={classes.containerResults}>
+                    <Grid item xs={2} className={classes.grid}>
+                        <Paper className={classes.paper}>Options</Paper>
+                        {<>
+                            <h2>Face</h2>
+                            <Divider />
+                            <h2>Stamp</h2>
+                            <Divider />
+                        </>
+                        }
                     </Grid>
+                    <Divider orientation="vertical" flexItem />
+
+                    <Grid item xs={2} className={classes.grid}>
+                        <Paper className={classes.paper}>Frequency</Paper>
+                        {
+                            Object.keys(datos).map(key => {
+                                if (!isNaN(datos[key][1] / frequency)) {
+                                    return (
+                                        <>
+                                            <h2>{datos[key][1]}</h2>
+                                            <Divider />
+                                        </>
+
+                                    )
+                                }
+
+                            })
+                        }
+                    </Grid>
+                    <Divider orientation="vertical" flexItem />
+                    <Grid item xs={2}>
+                        <Paper className={classes.paper}>Probability</Paper>
+
+                        {
+                            Object.keys(datos).map(key => {
+                                if (!isNaN(datos[key][1] / frequency)) {
+                                    return (
+                                        <>
+                                            <h2>{datos[key][1] / frequency}</h2>
+                                            <Divider />
+                                        </>
+
+                                    )
+                                }
+
+                            })
+                        }
+                    </Grid>
+                </Grid>
             }
         </>
     )

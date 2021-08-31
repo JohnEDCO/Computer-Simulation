@@ -8,6 +8,8 @@ import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import '../../Styles/exercise1.css'
 
 const useStyles = makeStyles((theme) => ({
@@ -119,6 +121,8 @@ function Exercise1() {
     const [open, setOpen] = useState(false)
     const [openDialog, setOpenDialog] = useState(false)
     const [sumaMayor, setSumaMayor] = useState(0)
+    const [loadedDice, setLoadedDice] = useState(false)
+    const [disabled, setDisabled] = useState(false)
     const saveSumDados = (key) => {
         switch (key) {
             case 2:
@@ -169,12 +173,12 @@ function Exercise1() {
         return random
     }
     const generateProbability = () => {
-        let mayor=0
-        let sumaMayor =0
+        let mayor = 0
+        let sumaMayor = 0
         Object.keys(datos).map(key => {
             if (!isNaN(datos[key][1] / frequency)) {
                 if (datos[key][1] > mayor) {
-                    mayor=datos[key][1]
+                    mayor = datos[key][1]
                     setSumaMayor(datos[key][0])
                     console.log("Mayor", datos[key][0], ': ', (datos[key][1]), mayor)
 
@@ -188,9 +192,13 @@ function Exercise1() {
     }
     const generateFrequency = (frequency) => {
         setDatos(initialState)
-
+        let sumita =0
         for (let i = 1; i < frequency + 1; i++) {
-            let sumita = generateRandom() + loadDice()
+            if(loadedDice){
+                sumita = generateRandom() + loadDice()
+            }else{
+                sumita = generateRandom() + generateRandom()
+            }
             saveSumDados(sumita)
         }
         generateProbability()
@@ -212,19 +220,48 @@ function Exercise1() {
                 </Button>
             </Dialog>
 
-            <Container style={{ flexDirection: "row", flex: "wrap", marginTop: 20, textAlign: "center" }}>
+            <Container style={{ flexDirection: "row", flex: "wrap", marginTop: 20, textAlign: "center", marginInline: 40}}>
                 <TextField
                     id="outlined-basic"
                     label="Frequency"
                     variant="outlined"
                     type="number"
-                    onChange={(event) => { setFrequency(event.target.value) }}
+                    onChange={(event) => { 
+                        setFrequency(event.target.value) 
+                        setDatos(initialState)
+                        setGenerateBool(false)
+                        setDisabled(false)
+                    }}
                 />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={loadedDice}
+                            name="checkedA"
+                            onChange={() => {
+                                setLoadedDice(!loadedDice)
+                                setDatos(initialState)
+                                setGenerateBool(false)
+                                setDisabled(false)
+                            }}
+                            
+                        />
+                    }
+                    label="Loaded dice"
+                    style={{marginInline: 20, marginTop: 5}}
+                />
+                
+
+            </Container>
+            <Container style={{ flexDirection: "row", flex: "wrap", marginTop: 20, textAlign: "center" }}>
+
                 <Button color="inherit"
+                    disabled={disabled}
                     className={classes.buttons}
                     onClick={() => {
                         generateFrequency(parseInt(frequency))
                         setGenerateBool(!generateBool)
+                        setDisabled(true)
                     }}>
                     Generate Frequency
                 </Button>
@@ -234,11 +271,12 @@ function Exercise1() {
                         setDatos(initialState)
                         setGenerateBool(false)
                         setOpen(!open)
+                        setDisabled(false)
                     }}>
                     Clean
                 </Button>
-            </Container>
 
+            </Container>
             {generateBool &&
                 <Grid container spacing={2} className={classes.containerResults}>
                     <Grid item xs={2} className={classes.grid}>
@@ -303,7 +341,7 @@ function Exercise1() {
                     <Grid item xs={2} className={classes.grid}>
                         <Paper className={classes.paper}>Frequency</Paper>
                         {
-                            Object.keys(datos).map((key,i) => {
+                            Object.keys(datos).map((key, i) => {
                                 if (!isNaN(datos[key][1] / frequency)) {
                                     return (
                                         <>
