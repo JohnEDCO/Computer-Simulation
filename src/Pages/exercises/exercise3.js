@@ -8,6 +8,11 @@ import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import Fab from '@material-ui/core/Fab';
+import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import '../../Styles/exercise1.css'
 
 const useStyles = makeStyles((theme) => ({
@@ -50,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
         height: 48,
         padding: '0 30px',
         marginInline: 5,
-        marginTop: 2,
+        marginTop: 25,
         width: "20%",
         marginInline: "40%",
         marginBottom: "5%"
@@ -106,7 +111,17 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "center",
         textAlign: "center",
         width: "10%"
-    }
+    },
+    fab: {
+        color: "white",
+        position: 'absolute',
+        bottom: theme.spacing(2),
+        right: theme.spacing(2),
+        backgroundColor: "black",
+        '&:hover': {
+            backgroundColor: "gray",
+        },
+    },
 }));
 
 function Exercise3() {
@@ -129,6 +144,7 @@ function Exercise3() {
     const [generateBool, setGenerateBool] = useState(false)
     const [open, setOpen] = useState(false)
     const [disabled, setDisabled] = useState(false)
+    const [openDialog2, setOpenDialog2] = useState(false)
 
     let best2 = 0
     let bestPath2 = []
@@ -207,7 +223,43 @@ function Exercise3() {
     }, [bestPath])
     return (
         <>
+            <Fab aria-label="add" className={classes.fab} color="white"
+                onClick={() => setOpenDialog2(true)}>
+                <HelpOutlineOutlinedIcon />
+            </Fab>
+            <Dialog onClose={() => setOpenDialog2(false)} aria-labelledby="simple-dialog-title" open={openDialog2} style={{ width: "100%", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+                <DialogTitle id="simple-dialog-title" >
+                    ¿Que es la bondad de estas estrategias?
+                </DialogTitle>
+                <DialogContent>
+                        Entendemos que es los recursos que necesita el algoritmo para funcionar de forma correcta y eficiente.
+                </DialogContent>
+                <DialogTitle id="simple-dialog-title" >
+                    ¿Que se puede decir sobre la convergencia?
+                </DialogTitle>
+                <DialogContent>
+                        Las dos estrategias llegan al mismo resultado en determinadas iteraciones
+                </DialogContent>
 
+
+                <DialogTitle id="simple-dialog-title" >
+                    ¿Que pasa con los minimos locales?
+                </DialogTitle>
+
+                <DialogContent>
+                        Sucede que entre mas pequeños sean estos los resultados no seran los esperados ya que
+                        las parejas aleatorias que se generan son menores y por ende la ruta sera modificada
+                        menos veces, produciendo esto que la respuesta del camino no sea la mas conveniente o la
+                        de menor valor                    
+                </DialogContent>
+                <Button color="inherit"
+                    className={classes.buttonsClose}
+                    onClick={() => {
+                        setOpenDialog2(false)
+                    }}>
+                    Close
+                </Button>
+            </Dialog>
             <Container style={{ flex: "wrap", marginTop: 20, textAlign: "center" }}>
                 <TextField
                     id="outlined-basic"

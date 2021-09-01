@@ -58,6 +58,11 @@ function NavBar() {
             Exercise 4
           </Button>
         </Link>
+        <Link className={classes.links} to='/Exercise5'>
+          <Button color="inherit">
+            Exercise 5
+          </Button>
+        </Link>
       </Toolbar>
     </AppBar >
   )

@@ -8,6 +8,8 @@ import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Fab from '@material-ui/core/Fab';
+import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import '../../Styles/exercise1.css'
 
 const useStyles = makeStyles((theme) => ({
@@ -94,7 +96,17 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "center",
         textAlign: "center",
         width: "10%"
-    }
+    },
+    fab: {
+        color: "white",
+        position: 'absolute',
+        bottom: theme.spacing(2),
+        right: theme.spacing(2),
+        backgroundColor: "black",
+        '&:hover': {
+            backgroundColor: "gray",
+        },
+    },
 }));
 
 function Exercise2() {
@@ -109,6 +121,7 @@ function Exercise2() {
     const [datos, setDatos] = useState(initialState)
     const [open, setOpen] = useState(false)
     const [openDialog, setOpenDialog] = useState(false)
+    const [openDialog2, setOpenDialog2] = useState(false)
     const [disabled, setDisabled] = useState(false)
 
     const saveReleases = (key) => {
@@ -143,6 +156,10 @@ function Exercise2() {
 
     return (
         <>
+            <Fab aria-label="add" className={classes.fab} color="white"
+            onClick={()=>setOpenDialog2(true)}>
+                <HelpOutlineOutlinedIcon />
+            </Fab>
             <Dialog onClose={() => setOpenDialog(false)} aria-labelledby="simple-dialog-title" open={openDialog} style={{ width: "100%", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
                 <DialogTitle id="simple-dialog-title" >
                     {
@@ -159,7 +176,20 @@ function Exercise2() {
                     Close
                 </Button>
             </Dialog>
-
+            <Dialog onClose={() => setOpenDialog2(false)} aria-labelledby="simple-dialog-title" open={openDialog2} style={{ width: "100%", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+                <DialogTitle id="simple-dialog-title" >
+                   Puede ser viable participar en el juego por la probabilidad de 50 y 50 en cada moneda.
+                   Podemos concluir que entre mas lanzamientos, puede haber mas posibilidad de ganar
+                   
+                </DialogTitle>
+                <Button color="inherit"
+                    className={classes.buttonsClose}
+                    onClick={() => {
+                        setOpenDialog2(false)
+                    }}>
+                    Close
+                </Button>
+            </Dialog>
             <Container style={{ flexDirection: "row", flex: "wrap", marginTop: 20, textAlign: "center" }}>
                 <TextField
                     id="outlined-basic"
@@ -169,7 +199,7 @@ function Exercise2() {
                     onChange={(event) => { setFrequency(event.target.value) }}
                 />
                 <Button color="inherit"
-                    disabled ={disabled}
+                    disabled={disabled}
                     className={classes.buttons}
                     onClick={() => {
                         setGenerateBool(true)

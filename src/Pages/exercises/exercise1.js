@@ -10,6 +10,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+
 import '../../Styles/exercise1.css'
 
 const useStyles = makeStyles((theme) => ({
@@ -192,11 +193,11 @@ function Exercise1() {
     }
     const generateFrequency = (frequency) => {
         setDatos(initialState)
-        let sumita =0
+        let sumita = 0
         for (let i = 1; i < frequency + 1; i++) {
-            if(loadedDice){
+            if (loadedDice) {
                 sumita = generateRandom() + loadDice()
-            }else{
+            } else {
                 sumita = generateRandom() + generateRandom()
             }
             saveSumDados(sumita)
@@ -207,6 +208,7 @@ function Exercise1() {
 
     return (
         <>
+            
             <Dialog onClose={() => setOpenDialog(false)} aria-labelledby="simple-dialog-title" open={openDialog} style={{ width: "100%", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
                 <DialogTitle id="simple-dialog-title" >
                     La suma de los dados con mayor frecuencia ha sido el {sumaMayor}
@@ -219,15 +221,14 @@ function Exercise1() {
                     Close
                 </Button>
             </Dialog>
-
-            <Container style={{ flexDirection: "row", flex: "wrap", marginTop: 20, textAlign: "center", marginInline: 40}}>
+            <Container style={{ flexDirection: "row", flex: "wrap", marginTop: 20, textAlign: "center", marginInline: 40 }}>
                 <TextField
                     id="outlined-basic"
                     label="Frequency"
                     variant="outlined"
                     type="number"
-                    onChange={(event) => { 
-                        setFrequency(event.target.value) 
+                    onChange={(event) => {
+                        setFrequency(event.target.value)
                         setDatos(initialState)
                         setGenerateBool(false)
                         setDisabled(false)
@@ -244,13 +245,13 @@ function Exercise1() {
                                 setGenerateBool(false)
                                 setDisabled(false)
                             }}
-                            
+
                         />
                     }
                     label="Loaded dice"
-                    style={{marginInline: 20, marginTop: 5}}
+                    style={{ marginInline: 20, marginTop: 5 }}
                 />
-                
+
 
             </Container>
             <Container style={{ flexDirection: "row", flex: "wrap", marginTop: 20, textAlign: "center" }}>

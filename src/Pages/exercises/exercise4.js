@@ -8,6 +8,10 @@ import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import Fab from '@material-ui/core/Fab';
+import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
+
 import '../../Styles/exercise1.css'
 
 const useStyles = makeStyles((theme) => ({
@@ -50,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
         height: 48,
         padding: '0 30px',
         marginInline: 5,
-        marginTop: 2,
+        marginTop: 25,
         width: "20%",
         marginInline: "40%",
         marginBottom: "5%"
@@ -106,6 +110,16 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "center",
         textAlign: "center",
         width: "10%"
+    },
+    fab: {
+        color: "white",
+        position: 'absolute',
+        bottom: theme.spacing(2),
+        right: theme.spacing(2),
+        backgroundColor: "black",
+        '&:hover': {
+            backgroundColor: "gray",
+        },
     }
 }));
 
@@ -121,6 +135,8 @@ function Exercise4() {
     const [min, setMin] = useState(0)
     const [timeTick, setTimeTick] = useState(0)
     const [timeProm, setTimeProm] = useState(0)
+    const [disabled, setDisabled] = useState(false)
+    const [openDialog2, setOpenDialog2] = useState(false)
 
     const convertSeconds = (seconds) => {
         let segundo = seconds % 60
@@ -177,7 +193,43 @@ function Exercise4() {
 
     return (
         <>
+            <Fab aria-label="add" className={classes.fab} color="white"
+                onClick={() => setOpenDialog2(true)}>
+                <HelpOutlineOutlinedIcon />
+            </Fab>
+            <Dialog onClose={() => setOpenDialog2(false)} aria-labelledby="simple-dialog-title" open={openDialog2} style={{ width: "100%", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+                <DialogTitle id="simple-dialog-title" >
+                    ¿Tiempo que se demoraron?
+                </DialogTitle>
+                <DialogContent>
+                    El tiempo que tardaron se ve reflejado en la tabla al terminar el proceso. 
+                    Es una suma de los tiempos de atencion de cada cliente en taquilla.
+                </DialogContent>
+                <DialogTitle id="simple-dialog-title" >
+                    ¿Se forman colas?
+                </DialogTitle>
+                <DialogContent>
+                    Si. En la tabla de datos nos muestra las colas que se generan junto con el tamaño de cada
+                    cola, cabe mencionar que cada cola se genera en determinado momento, por eso mostramos la cantidad y cuantas
+                    colas se generaron.
+                </DialogContent>
 
+
+                <DialogTitle id="simple-dialog-title" >
+                    ¿Que es el tiempo promedio en cola?
+                </DialogTitle>
+
+                <DialogContent>
+                    Es el tiempo promedio que espera cada persona en la cola
+                </DialogContent>
+                <Button color="inherit"
+                    className={classes.buttonsClose}
+                    onClick={() => {
+                        setOpenDialog2(false)
+                    }}>
+                    Close
+                </Button>
+            </Dialog>
             <Container style={{ flex: "wrap", marginTop: 20, textAlign: "center" }}>
                 <TextField
                     id="outlined-basic"
@@ -190,7 +242,6 @@ function Exercise4() {
 
                 <Container style={{ flexDirection: "row", flex: "wrap", marginTop: 20, textAlign: "center" }}>
                     <Paper className={classes.title}>Ballot control time</Paper>
-
                     <TextField
                         id="outlined-basic"
                         label="Seg(s)"
@@ -215,10 +266,12 @@ function Exercise4() {
                 <Container style={{ flexDirection: "row", flex: "wrap", marginTop: 20, textAlign: "center" }}>
 
                     <Button color="inherit"
+                        disabled={disabled}
                         className={classes.buttons}
                         onClick={() => {
                             timeTicket()
                             setGenerateBool(true)
+                            setDisabled(true)
                         }}>
                         Estimate
                     </Button>
@@ -230,9 +283,11 @@ function Exercise4() {
                             setTimeTick(0)
                             setTimeProm(0)
                             setCola([])
+                            setDisabled(false)
                         }}>
                         Clean
                     </Button>
+
                 </Container>
 
             </Container>
