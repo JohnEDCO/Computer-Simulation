@@ -160,8 +160,8 @@ function Algorithm2() {
 
         return op1 < 0
             ? op2 < 0
-                ? op3 : op2
-            : op1
+                ? op3.toFixed(0) : op2.toFixed(0)
+            : op1.toFixed(0)
 
     }
     const generarCodigos = (a, m, semilla) => {

@@ -41,16 +41,16 @@ function NavBar() {
   const [menu1, setMenu1] = useState(null);
   const [menu2, setMenu2] = useState(null);
   const handleClick = (event, type) => {
-    type== 0?
-    setMenu1(event.currentTarget)
-    :setMenu2(event.currentTarget)
-    
+    type == 0 ?
+      setMenu1(event.currentTarget)
+      : setMenu2(event.currentTarget)
+
   };
 
   const handleClose = (type) => {
-    type== 0?
-    setMenu1(null)
-    :setMenu2(null)
+    type == 0 ?
+      setMenu1(null)
+      : setMenu2(null)
   };
   return (
     <AppBar position="relative" style={{ background: "#232121" }}>
@@ -59,7 +59,7 @@ function NavBar() {
           Computer Simulation Exercises
         </Typography>
 
-        <Button className={classes.links} aria-controls="simple-menu" aria-haspopup="true" onClick={(event)=>handleClick(event, 0)}>
+        <Button className={classes.links} aria-controls="simple-menu" aria-haspopup="true" onClick={(event) => handleClick(event, 0)}>
           WorkShop 1
         </Button>
         <Menu
@@ -67,26 +67,26 @@ function NavBar() {
           anchorEl={menu1}
           keepMounted
           open={Boolean(menu1)}
-          onClose={()=>handleClose(0)}
+          onClose={() => handleClose(0)}
         >
-          <Link className={classes.items} to='/Exercise1' onClose={()=>handleClose(0)}>
+          <Link className={classes.items} to='/Exercise1' onClose={() => handleClose(0)}>
             <MenuItem className={classes.items} >Exercise 1</MenuItem>
           </Link>
-          <Link className={classes.items} to='/Exercise2' onClose={()=>handleClose(0)}>
+          <Link className={classes.items} to='/Exercise2' onClose={() => handleClose(0)}>
             <MenuItem className={classes.items}  >Exercise 2</MenuItem>
           </Link>
-          <Link className={classes.items} to='/Exercise3' onClose={()=>handleClose(0)}>
+          <Link className={classes.items} to='/Exercise3' onClose={() => handleClose(0)}>
             <MenuItem className={classes.items} >Exercise 3</MenuItem>
           </Link>
-          <Link className={classes.items} to='/Exercise4' onClose={()=>handleClose(0)}>
+          <Link className={classes.items} to='/Exercise4' onClose={() => handleClose(0)}>
             <MenuItem className={classes.items} >Exercise 4</MenuItem>
           </Link>
-          <Link className={classes.items} to='/Exercise5' onClose={()=>handleClose(0)}>
+          <Link className={classes.items} to='/Exercise5' onClose={() => handleClose(0)}>
             <MenuItem className={classes.items} >Exercise 5</MenuItem>
           </Link>
         </Menu>
 
-        <Button className={classes.links} aria-controls="simple-menu" aria-haspopup="true" onClick={(event)=>handleClick(event, 1)}>
+        <Button className={classes.links} aria-controls="simple-menu" aria-haspopup="true" onClick={(event) => handleClick(event, 1)}>
           WorkShop 2
         </Button>
         <Menu
@@ -94,13 +94,13 @@ function NavBar() {
           anchorEl={menu2}
           keepMounted
           open={Boolean(menu2)}
-          onClose={()=>handleClose(1)}
+          onClose={() => handleClose(1)}
         >
-          <Link className={classes.items} to='/Algorithm1' onClose={()=>handleClose(1)}>
-            <MenuItem className={classes.items} >Linear congruential algorithm</MenuItem>
+          <Link className={classes.items} to='/Algorithm1' onClose={() => handleClose(1)}>
+            <MenuItem className={classes.items} >Linear congruencial generator</MenuItem>
           </Link>
-          <Link className={classes.items} to='/Algorithm2' onClose={()=>handleClose(1)}>
-            <MenuItem className={classes.items} >Linear congruential algorithm 2</MenuItem>
+          <Link className={classes.items} to='/Algorithm2' onClose={() => handleClose(1)}>
+            <MenuItem className={classes.items} >Minimum standard generator</MenuItem>
           </Link>
         </Menu>
       </Toolbar>
