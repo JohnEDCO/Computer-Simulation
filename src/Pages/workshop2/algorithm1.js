@@ -308,8 +308,9 @@ function Algorithm1() {
         [0, 0.001, 0, 0, 0],
         [0, 0.504, 0, 0, 0],
     ]
-    //variables pruebbas series
     const [datos, setDatos] = useState(initialState)
+    
+    //variables pruebbas series
     const [series, setSeries] = useState(initialState2)
     const [seriesFEFO, setSeriesFEFO] = useState(initialState3)
     //variables pruebas poker

@@ -17,7 +17,7 @@ import TableRow from '@material-ui/core/TableRow';
 import '../../Styles/exercise1.css'
 
 const useStyles = makeStyles((theme) => ({
-    
+
     root: {
         flexGrow: 1,
     },
@@ -252,6 +252,16 @@ function Algorithm2() {
     const [xcrit, setXcrit] = useState(16.92)
     const [DMcrit, setDMcrit] = useState(0.043)
 
+    //para las corridas
+    const [totalRuns, setTotalRuns] = useState(0)
+    const [runs, setRuns] = useState("* ")
+    const [media, setMedia] = useState(0)
+    const [varianza, setVarianza] = useState(0)
+
+    //para las series
+    const [FE, setFE] = useState(0)
+    const [resultXcalc, setResultXcalc] = useState(0)
+
     // [0][2]-->FO
     // [0][3]--> (FE-FO)2 / FE
     // [0][4]--> FOA
@@ -270,11 +280,47 @@ function Algorithm2() {
         [0.8, 0.9, 0, 0, 0, 0, 0, 0],
         [0.9, 1, 0, 0, 0, 0, 0, 0],
     ]
+    // estos arrays son para las pruebas de series
+    const initialState2 = [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+    ]
+    const initialState3 = [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+    ]
+    //estos arrays son para las pruebas de poker
+    const amountRepeatsNum = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+    // [0][0]---> FO poker       [0][0] --> 1P
+    // [0][1]---> Probabilidad   [1][0] --> 2P
+    // [0][2]--->  FE            [2][0] --> T
+    // [0][3]---> (FE-FO)2 / FE  [3][0] --> Pk
+    //                           [4][4]--->  TD                 
+    const initialStatePoker = [
+        [0, 0.432, 0, 0, 0],
+        [0, 0.027, 0, 0, 0],
+        [0, 0.036, 0, 0, 0],
+        [0, 0.001, 0, 0, 0],
+        [0, 0.504, 0, 0, 0],
+    ]
     //variables pruebas uniformidad
     const [datos, setDatos] = useState(initialState)
+    //variables pruebbas series
+    const [series, setSeries] = useState(initialState2)
+    const [seriesFEFO, setSeriesFEFO] = useState(initialState3)
+    //variables pruebas poker
+    const [amountNumsRepeat, setAmountNumsRepeat] = useState(amountRepeatsNum)
+    const [poker, setPoker] = useState(initialStatePoker)
+    const [xcalcPoker, setXCalcPoker] = useState(0)
+    const [xcritPoker, setXCritPoker] = useState(2.195)
 
-    
     const saveRange = (key) => {
         console.log("vea la key-->", key)
         let periodo = key
@@ -317,6 +363,65 @@ function Algorithm2() {
                 break;
         }
     }
+    const getSeriePosition = (key) => {
+        console.log("vea la key-->", key)
+        let dato = key
+        switch (true) {
+            case (dato >= 0 && dato < 0.2):
+                return 0
+            case (dato >= 0.2 && dato < 0.4):
+                return 1
+            case (dato >= 0.4 && dato < 0.6):
+                return 2
+            case (dato >= 0.6 && dato < 0.8):
+                return 3
+            case (dato >= 0.8 && dato <= 1):
+                return 4
+            case (dato > 1):
+                console.log("OJO QUE EL PERIODO SE PASO DE 1")
+                break;
+            default:
+                console.log("ninguno es opcion")
+                break;
+        }
+    }
+    const calculatePEA_POA = () => {
+        let value = 0
+        let dmcalc = 0
+        for (let i = 0; i < datos.length; i++) {
+            value = Math.abs((datos[i][6] - datos[i][5]).toFixed(3))
+            if (value > dmcalc) {
+                console.log("value--->", value)
+                dmcalc = value
+                setDMcalc(value)
+            }
+            setDatos([...datos, datos[i][7] = value])
+        }
+
+        console.log(DMcalc)
+    }
+    const calculatePEA = () => {
+        let fe = codes / 10
+        console.log(fe)
+        for (let i = 0; i < datos.length; i++) {
+            // setDatos([...datos, datos[i][6] = parseFloat(datos[i][5]).toFixed(1)])
+            setDatos([...datos, datos[i][6] = (fe * (i + 1) / codes).toFixed(1)])
+        }
+    }
+    const calculatePOA = () => {
+        for (let i = 0; i < datos.length; i++) {
+            setDatos([...datos, datos[i][5] = (datos[i][4] / codes).toFixed(3)])
+        }
+    }
+    const calculateFOA = () => {
+        for (let i = 0; i < datos.length; i++) {
+            if (i == 0) {
+                setDatos([...datos, datos[i][4] = datos[i][2]])
+            } else {
+                setDatos([...datos, datos[i][4] = datos[i - 1][4] + datos[i][2]])
+            }
+        }
+    }
     const calculateChi = () => {
         let fe = codes / 10
         let resultado = 0
@@ -344,8 +449,161 @@ function Algorithm2() {
             : op1.toFixed(0)
 
     }
+    const generarCorridas = () => {
+        let corridas = "* "
+        let count = 0
+        let total = 1
+        let plus = 0
+        for (let i = 0; i < rows.length; i++) {
+            if (i !== 0) {
+                if (count > (rows[i].code) / m) {
+                    if (plus == 2) {
+                        total++
+                    }
+                    corridas += "+ "
+                    plus = 1
+                } else {
+                    if (plus == 1) {
+                        total++
+                    }
+                    corridas += "- "
+
+                    plus = 2
+                }
+            } else {
+                count = (rows[i].code) / m
+            }
+
+            count = (rows[i].code) / m
+
+        }
+        console.log("total-->", total)
+        setRuns(corridas)
+        setTotalRuns(total)
+        setMedia((((2 * codes) - 1) / 3).toFixed(2))
+        setVarianza((((16 * codes) - 29) / 90).toFixed(2))
+    }
+    //funciones para todo lo de pruebas de series
+    const saveSerie = (row, column) => {
+        console.log("Pareja-->", "(" + row + "," + column + ")")
+        let position1 = getSeriePosition(row)
+        let position2 = getSeriePosition(column)
+
+        console.log(position1, position2)
+        setSeries([...series, series[position1][position2] += 1])
+    }
+    const getTestSeries = () => {
+        let total = 0
+        let result = 0
+        let fe = (codes / 2) / 25
+        Object.keys(series).map((key1) => {
+            Object.keys(series).map((key2) => {
+                result = (Math.pow(fe - series[key1][key2], 2) / fe).toFixed(2)
+                if (series[key1][key2] !== undefined) {
+                    console.log(series[key1][key2], result)
+                    setSeriesFEFO([...seriesFEFO, seriesFEFO[key1][key2] = result])
+
+                }
+                total += parseFloat(result)
+
+                console.log("result-->", total)
+            })
+        })
+        setResultXcalc(total.toFixed(2))
+        console.log("resultado total-->", total.toFixed(2), fe)
+    }
+
+    // Estas funciones son para la prueba de poker
+    const cleanNumsRepeatPoker = () => {
+        for (let i = 0; i < amountNumsRepeat.length; i++) {
+            setAmountNumsRepeat([...amountNumsRepeat, amountNumsRepeat[i] = 0])
+        }
+    }
+    const calculateFEPoker = () => {
+        let resultado = 0
+        Object.keys(poker).map((key) => {
+            console.log("JEJEJEJEJE", poker[key][1])
+            resultado = (poker[key][1] * codes).toFixed(3)
+            setPoker([...poker, poker[key][2] = resultado])
+
+        })
+
+    }
+    const calculateFE_FO_Poker = () => {
+        let resultado = 0
+        let fe = 0
+        let xcalculado = 0
+
+        Object.keys(poker).map((key) => {
+            console.log("JEJEJEJEJE", poker[key][1])
+            fe = poker[key][2]
+            resultado = Math.pow((fe - poker[key][0]), 2) / fe
+            setPoker([...poker, poker[key][3] = resultado.toFixed(3)])
+
+            xcalculado += resultado
+        })
+        console.log("calculadooo--<", xcalculado)
+
+        setXCalcPoker(xcalculado.toFixed(3))
+    }
+    const verifyAmountNumsPoker = (num) => {
+        console.log("vea el numero-->", num, num.length)
+        let position = 0
+
+        let par = 0
+        let trecilla = 0
+        let PK = 0
+        let TD = 0
+        for (let i = 0; i < num.length; i++) {
+            position = num[i]
+            console.log("hey position-->", position)
+            setAmountNumsRepeat([...amountNumsRepeat, amountNumsRepeat[position] += 1])
+
+        }
+        console.log("veaa esteee......>", amountNumsRepeat)
+
+        for (let i = 0; i < amountNumsRepeat.length; i++) {
+            console.log("cantidad-->", amountNumsRepeat[i])
+            if (amountNumsRepeat[i] == 2) {
+                par += 1
+            } else if (amountNumsRepeat[i] == 3) {
+                trecilla += 1
+            } else if (amountNumsRepeat[i] == 4) {
+                PK += 1
+            }
+        }
+
+        if (par == 0 && trecilla == 0 && PK == 0) {
+            setPoker([...poker, poker[4][0] += 1])
+        }
+        if (par !== 0) {
+            if (par == 1) {
+                setPoker([...poker, poker[0][0] += 1])
+            } else if (par == 2) {
+                setPoker([...poker, poker[1][0] += 1])
+            }
+        }
+        if (trecilla !== 0) {
+            setPoker([...poker, poker[2][0] += 1])
+        }
+        if (PK !== 0) {
+            setPoker([...poker, poker[3][0] += 1])
+        }
+        console.log(par, trecilla, PK, TD, poker)
+    }
+    const separate = async () => {
+        calculateFEPoker()
+        for (let i = 0; i < codes; i++) {
+            verifyAmountNumsPoker((rows[i].rn).slice(2, 6))
+            cleanNumsRepeatPoker()
+        }
+        calculateFE_FO_Poker()
+    }
+    // Hasta aqui prueba de poker
     const generarCodigos = (a, m, semilla) => {
         let ultimo = semilla
+        let par = 0
+        let dato = 0
 
         for (let i = 1; i < codes + 1; i++) {
             if (i == 1) {
@@ -357,8 +615,36 @@ function Algorithm2() {
                 rows.push(createData(i, ultimo, (ultimo / m).toFixed(4)))
                 saveRange((ultimo / m))
             }
+
+            //logica para coger pares
+            if (par == 0) {
+                dato = ultimo
+            }
+            par++
+
+            if (par == 2) {
+                //    console.log("pareja ("+dato+","+ultimo+")")
+                saveSerie((dato / m), (ultimo / m))
+                par = 0
+            } else if (i + 1 > codes) {
+                // console.log("Cantidad de codigos impar -->", ultimo, 0)
+                saveSerie((ultimo / m), 0)
+            } else {
+                // console.log("datos -->", dato, ultimo)
+            }
         }
+
+
+        setFE((codes / 2) / 25)
         calculateChi()
+        calculateFOA()
+        calculatePOA()
+        calculatePEA()
+        calculatePEA_POA()
+        generarCorridas()
+        getTestSeries()
+        separate()
+        setGenerateBool(true)
     }
 
     return (
@@ -378,6 +664,7 @@ function Algorithm2() {
 
 
                 <Container style={{ flexDirection: "row", flex: "wrap", marginTop: 20, textAlign: "center" }}>
+
                     <Paper className={classes.title}>Necessary information</Paper>
                     <TextField
                         value={a}
@@ -481,8 +768,8 @@ function Algorithm2() {
                     </Button>
 
                 </Container>
-
             </Container>
+
             {generateBool &&
                 <>
                     <br />
@@ -627,7 +914,641 @@ function Algorithm2() {
                         </Grid>
 
                     </Grid>
-                    
+                    {/*Prueba uniformidad Kolmogorov*/}
+                    <Paper className={classes.titleAlgorithm2}>Kolmogorov uniformity tests</Paper>
+                    <Grid container spacing={2} className={classes.containerResults}>
+
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>Range</Paper>
+                            {<>
+                                <h2>( {datos[0][0]} - {datos[0][1]})</h2>
+                                <Divider />
+                                <h2>( {datos[1][0]} - {datos[1][1]})</h2>
+                                <Divider />
+                                <h2>( {datos[2][0]} - {datos[2][1]})</h2>
+                                <Divider />
+                                <h2>( {datos[3][0]} - {datos[3][1]})</h2>
+                                <Divider />
+                                <h2>( {datos[4][0]} - {datos[4][1]})</h2>
+                                <Divider />
+                                <h2>( {datos[5][0]} - {datos[5][1]})</h2>
+                                <Divider />
+                                <h2>( {datos[6][0]} - {datos[6][1]})</h2>
+                                <Divider />
+                                <h2>( {datos[7][0]} - {datos[7][1]})</h2>
+                                <Divider />
+                                <h2>( {datos[8][0]} - {datos[8][1]})</h2>
+                                <Divider />
+                                <h2>( {datos[9][0]} - {datos[9][1]})</h2>
+                                <Divider />
+                            </>
+                            }
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>FO</Paper>
+                            {<>
+                                <h2>{datos[0][2]}</h2>
+                                <Divider />
+                                <h2>{datos[1][2]}</h2>
+                                <Divider />
+                                <h2>{datos[2][2]}</h2>
+                                <Divider />
+                                <h2>{datos[3][2]}</h2>
+                                <Divider />
+                                <h2>{datos[4][2]}</h2>
+                                <Divider />
+                                <h2>{datos[5][2]}</h2>
+                                <Divider />
+                                <h2>{datos[6][2]}</h2>
+                                <Divider />
+                                <h2>{datos[7][2]}</h2>
+                                <Divider />
+                                <h2>{datos[8][2]}</h2>
+                                <Divider />
+                                <h2>{datos[9][2]}</h2>
+                                <Divider />
+
+                            </>
+                            }
+                        </Grid>
+
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>FOA</Paper>
+                            {
+                                Object.keys(datos).map(key => {
+                                    if (key <= 9) {
+                                        return (
+                                            <>
+                                                <h2>{datos[key][4]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>POA</Paper>
+                            {
+                                Object.keys(datos).map(key => {
+                                    if (key <= 9) {
+                                        return (
+                                            <>
+                                                <h2>{datos[key][5]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+                                })
+                            }
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>PEA</Paper>
+                            {
+                                Object.keys(datos).map(key => {
+
+                                    return (
+                                        <>
+                                            <h2>{datos[key][6]}</h2>
+                                            <Divider />
+                                        </>
+                                    )
+                                })
+                            }
+                            <h2 style={{ background: "#156cff", padding: 7, marginTop: 0 }}>DMcalc</h2>
+                            <Divider />
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={2} className={classes.grid}>
+                            <Paper className={classes.paper}>| PEA - POA |</Paper>
+                            {
+                                Object.keys(datos).map(key => {
+                                    if (key <= 9) {
+                                        return (
+                                            <>
+                                                <h2>{datos[key][7]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+                                })
+                            }
+                            <h2 style={{ background: "#156cff", padding: 7, marginTop: 12 }}>{DMcalc}</h2>
+                            <Divider />
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+
+                        <Grid item xs={2} className={classes.grid}>
+                            <Paper className={classes.paper}>DMcrit</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {DMcrit}
+                            </h2>
+
+                            <br />
+                            <Paper className={classes.paper}>Confidence level α</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                0,05
+                            </h2>
+
+                            <br />
+                            <Paper className={classes.paper}>Degrees of freedom</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {codes - 1}
+                            </h2>
+
+                            {DMcalc <= DMcrit ?
+                                <h2 style={{ marginTop: 50 }}>
+                                    The generator is good in terms of uniformity.
+                                </h2>
+                                : <h2 style={{ padding: 7, margin: 20 }}>
+                                    Generator not good in terms of uniformity
+                                </h2>
+                            }
+                        </Grid>
+                    </Grid>
+                    {/*Prueba Independencia CORRIDAS*/}
+                    <Paper className={classes.titleAlgorithm3}>Independence test runs</Paper>
+                    <Grid container spacing={2} className={classes.containerResults}>
+
+                        <Grid item xs={8} className={classes.grid}>
+                            {/* <Paper className={classes.paper}>Range</Paper> */}
+
+                            <h1 style={{ fontWeight: "normal", fontSize: 22, textAlign: "justify", background: "transparent" }}>
+                                {runs}
+                            </h1>
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={2} className={classes.grid}>
+                            <Paper className={classes.paper}>Runs</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {totalRuns}
+                            </h2>
+                            <br />
+                            <Paper className={classes.paper}>µₐ</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {media}
+                            </h2>
+                            <br />
+                            <Paper className={classes.paper}>σ²ₐ</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {varianza}
+                            </h2>
+
+                            <br />
+                            <Paper className={classes.paper}>Z0,025</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                ± {1.96}
+                            </h2>
+
+                            <br />
+                            <Paper className={classes.paper}>Zabs</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {((totalRuns - media) / Math.sqrt(varianza)).toFixed(2)}
+                            </h2>
+
+                            <br />
+                            <Paper className={classes.paper}>α</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                0,05
+                            </h2>
+
+                            {((totalRuns - media) / Math.sqrt(varianza)).toFixed(2) <= 1.96
+                                && ((totalRuns - media) / Math.sqrt(varianza)).toFixed(2) >= -1.96 ?
+                                <h2 style={{ marginTop: 30 }}>
+                                    No evidence to reject the independence hypothesis.
+                                </h2>
+                                : <h2 style={{ padding: 7, margin: 20 }}>
+                                    The hypothesis of independence is rejected
+                                </h2>
+                            }
+                        </Grid>
+                    </Grid>
+
+                    {/*Prueba Independencia SERIES*/}
+                    <Paper className={classes.titleAlgorithm4}>Independence test series</Paper>
+                    <Grid container spacing={2} className={classes.containerResults}>
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper style={{ paddingTop: 32, background: "transparent" }}></Paper>
+                            {<>
+
+                                <h2 className={classes.paper2}>0 - 0.2</h2>
+                                <h2 className={classes.paper2}>0.2 - 0.4</h2>
+                                <h2 className={classes.paper2}>0.4 - 0.6</h2>
+                                <h2 className={classes.paper2}>0.6 - 0.8</h2>
+                                <h2 className={classes.paper2}>0.8 - 1</h2>
+                            </>
+                            }
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>0 - 0.2</Paper>
+                            {
+                                Object.keys(series).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{series[key][0]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                        </Grid>
+
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>0.2 - 0.4</Paper>
+
+                            {
+                                Object.keys(series).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{series[key][1]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>0.4 - 0.6</Paper>
+                            {
+                                Object.keys(series).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{series[key][2]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>0.6 - 0.8</Paper>
+                            {
+                                Object.keys(series).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{series[key][3]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>0.8 - 1</Paper>
+                            {
+                                Object.keys(series).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{series[key][4]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+
+                        <Grid item xs={2} className={classes.grid}>
+                            <Paper className={classes.paper}>FE</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {FE}
+                            </h2>
+
+                            <br />
+                            <Paper className={classes.paper}>Confidence level α</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                0,05
+                            </h2>
+
+                            <br />
+                            <Paper className={classes.paper}>Degrees of freedom</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {Math.pow(series.length - 1, 2) - 1}
+                            </h2>
+
+                        </Grid>
+                        {/* Segunda tabla pero con el Xcalc */}
+                        <Grid container spacing={2} className={classes.containerResults2}>
+
+                            <Grid item xs={1.5} className={classes.grid}>
+                                <Paper style={{ paddingTop: 32, background: "transparent" }}></Paper>
+                                {<>
+
+                                    <h2 className={classes.paper2}>0 - 0.2</h2>
+                                    <h2 className={classes.paper2}>0.2 - 0.4</h2>
+                                    <h2 className={classes.paper2}>0.4 - 0.6</h2>
+                                    <h2 className={classes.paper2}>0.6 - 0.8</h2>
+                                    <h2 className={classes.paper2}>0.8 - 1</h2>
+                                </>
+                                }
+                            </Grid>
+                            <Divider orientation="vertical" flexItem />
+
+                            <Grid item xs={1.5} className={classes.grid}>
+                                <Paper className={classes.paper}>0 - 0.2</Paper>
+                                {
+                                    Object.keys(seriesFEFO).map(key => {
+                                        if (key <= 4) {
+                                            return (
+                                                <>
+                                                    <h2>{seriesFEFO[key][0]}</h2>
+                                                    <Divider />
+                                                </>
+                                            )
+                                        }
+
+                                    })
+                                }
+                            </Grid>
+
+                            <Divider orientation="vertical" flexItem />
+                            <Grid item xs={1.5} className={classes.grid}>
+                                <Paper className={classes.paper}>0.2 - 0.4</Paper>
+
+                                {
+                                    Object.keys(seriesFEFO).map(key => {
+                                        if (key <= 4) {
+                                            return (
+                                                <>
+                                                    <h2>{seriesFEFO[key][1]}</h2>
+                                                    <Divider />
+                                                </>
+                                            )
+                                        }
+
+                                    })
+                                }
+                            </Grid>
+                            <Divider orientation="vertical" flexItem />
+                            <Grid item xs={1.5} className={classes.grid}>
+                                <Paper className={classes.paper}>0.4 - 0.6</Paper>
+                                {
+                                    Object.keys(seriesFEFO).map(key => {
+                                        if (key <= 4) {
+                                            return (
+                                                <>
+                                                    <h2>{seriesFEFO[key][2]}</h2>
+                                                    <Divider />
+                                                </>
+                                            )
+                                        }
+
+                                    })
+                                }
+                            </Grid>
+                            <Divider orientation="vertical" flexItem />
+                            <Grid item xs={1.5} className={classes.grid}>
+                                <Paper className={classes.paper}>0.6 - 0.8</Paper>
+                                {
+                                    Object.keys(seriesFEFO).map(key => {
+                                        if (key <= 4) {
+                                            return (
+                                                <>
+                                                    <h2>{seriesFEFO[key][3]}</h2>
+                                                    <Divider />
+                                                </>
+                                            )
+                                        }
+
+                                    })
+                                }
+                            </Grid>
+                            <Divider orientation="vertical" flexItem />
+                            <Grid item xs={1.5} className={classes.grid}>
+                                <Paper className={classes.paper}>0.8 - 1</Paper>
+                                {
+                                    Object.keys(seriesFEFO).map(key => {
+                                        if (key <= 4) {
+                                            return (
+                                                <>
+                                                    <h2>{seriesFEFO[key][4]}</h2>
+                                                    <Divider />
+                                                </>
+                                            )
+                                        }
+
+                                    })
+                                }
+
+                            </Grid>
+                            <Divider orientation="vertical" flexItem />
+                            <Divider orientation="vertical" flexItem />
+                            <Divider orientation="vertical" flexItem />
+                            <Divider orientation="vertical" flexItem />
+                            <Divider orientation="vertical" flexItem />
+
+                            <Grid item xs={2} className={classes.grid}>
+
+                                <br />
+                                <Paper className={classes.paper}>X²crit</Paper>
+                                <br />
+                                <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                    {36.42}
+                                </h2>
+
+                                <br />
+                                <Paper className={classes.paper}>X²calc</Paper>
+                                <br />
+                                <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                    {resultXcalc}
+                                </h2>
+
+                                {(resultXcalc < 36.42) ?
+                                    <h2 style={{ marginTop: 30 }}>
+                                        The hypothesis that the data have a two-dimensional uniform distribution is accepted.
+                                    </h2>
+                                    : <h2 style={{ padding: 7, margin: 20 }}>
+                                        The hypothesis that the data have a two-dimensional uniform distribution is not accepted.
+                                    </h2>
+                                }
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    {/*Prueba Independencia POKER*/}
+                    <Paper className={classes.titleAlgorithm5}>Independence test Poker</Paper>
+                    <Grid container spacing={2} className={classes.containerResults}>
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper style={{ paddingTop: 32, background: "transparent" }}></Paper>
+                            {<>
+
+                                <h2 className={classes.paper2}>1P</h2>
+                                <h2 className={classes.paper2}>2P</h2>
+                                <h2 className={classes.paper2}>T</h2>
+                                <h2 className={classes.paper2}>PK</h2>
+                                <h2 className={classes.paper2}>TD</h2>
+                            </>
+                            }
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>FO</Paper>
+                            {
+                                Object.keys(poker).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{poker[key][0]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                        </Grid>
+
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>Probability</Paper>
+
+                            {
+                                Object.keys(poker).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{poker[key][1]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>FE</Paper>
+                            {
+                                Object.keys(poker).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{poker[key][2]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                            <br />
+                            <Divider />
+                            <h2 style={{ background: "#5947ff", padding: 7, marginTop: 0 }}>
+                                X²calc
+                            </h2>
+                            <Divider />
+                        </Grid>
+
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={2} className={classes.grid}>
+                            <Paper className={classes.paper}>(FE-FO)² / FE</Paper>
+                            {
+                                Object.keys(poker).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{poker[key][3]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                            <br />
+                            <Divider />
+                            <h2 style={{ background: "#5947ff", padding: 7, marginTop: 0 }}>
+                                {xcalcPoker}
+                            </h2>
+                            <Divider />
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+
+                        <Grid item xs={2} className={classes.grid}>
+                            <Paper className={classes.paper}>X²crit</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {xcritPoker}
+                            </h2>
+
+                            <br />
+                            <Paper className={classes.paper}>Confidence level α</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                0,70
+                            </h2>
+
+                            <br />
+                            <Paper className={classes.paper}>Degrees of freedom</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {(poker.length - 2)}
+                            </h2>
+
+                            {(xcalcPoker < xcritPoker) ?
+                                <h2 style={{ marginTop: 30 }}>
+                                    The sequence of numbers passes the test
+                                </h2>
+                                : <h2 style={{ padding: 7, margin: 20 }}>
+                                    The sequence of numbers does not pass the test
+                                </h2>
+                            }
+                        </Grid>
+
+                    </Grid>
+                    {/* Parte de los codigos*/}
                     <Grid container spacing={2} className={classes.containerResults}>
                         <Paper className={classes.root}>
                             <TableContainer className={classes.container}>
@@ -638,7 +1559,7 @@ function Algorithm2() {
                                                 <TableCell
                                                     key={column.id}
                                                     align={column.align}
-                                                    style={{ minWidth: column.minWidth,background: "black", color: "white" }}
+                                                    style={{ minWidth: column.minWidth, background: "black", color: "white" }}
                                                 >
                                                     {column.label}
                                                 </TableCell>
