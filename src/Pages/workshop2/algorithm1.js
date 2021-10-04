@@ -186,6 +186,20 @@ const useStyles = makeStyles((theme) => ({
         marginTop: 30,
         fontWeight: "bold"
     },
+    titleAlgorithm5: {
+        fontSize: 14,
+        padding: theme.spacing(1),
+        textAlign: 'center',
+        color: "black",
+        background: "transparent",
+        boxShadow: '0 3px 5px 2px rgba(50, 50, 50, .3)',
+        background: '#5947ff',
+        width: "22%",
+        marginInline: "39%",
+        marginBottom: 20,
+        marginTop: 30,
+        fontWeight: "bold"
+    },
     grid: {
         background: "transparent",
         alignItems: "center",
@@ -209,15 +223,15 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 const columns = [
-    { id: 'name', label: '#', minWidth: 170 },
+    { id: 'id', label: '#', minWidth: 170 },
     { id: 'code', label: 'Codes', minWidth: 100 },
+    { id: 'rn', label: 'Rn', minWidth: 100 },
 
 ];
-function createData(name, code) {
-    return { name, code }; 
+function createData(id, code, rn) {
+    return { id, code, rn };
 }
 let rows = [];
-let rowsRn = [];
 
 function Algorithm1() {
     const classes = useStyles();
@@ -264,6 +278,7 @@ function Algorithm1() {
         [0.8, 0.9, 0, 0, 0, 0, 0, 0],
         [0.9, 1, 0, 0, 0, 0, 0, 0],
     ]
+    // estos arrays son para las pruebas de series
     const initialState2 = [
         [0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0],
@@ -278,10 +293,30 @@ function Algorithm1() {
         [0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0],
     ]
+    //estos arrays son para las pruebas de poker
+    const amountRepeatsNum = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+    // [0][0]---> FO poker       [0][0] --> 1P
+    // [0][1]---> Probabilidad   [1][0] --> 2P
+    // [0][2]--->  FE            [2][0] --> T
+    // [0][3]---> (FE-FO)2 / FE  [3][0] --> Pk
+    //                           [4][4]--->  TD                 
+    const initialStatePoker = [
+        [0, 0.432, 0, 0, 0],
+        [0, 0.027, 0, 0, 0],
+        [0, 0.036, 0, 0, 0],
+        [0, 0.001, 0, 0, 0],
+        [0, 0.504, 0, 0, 0],
+    ]
+    //variables pruebbas series
     const [datos, setDatos] = useState(initialState)
     const [series, setSeries] = useState(initialState2)
     const [seriesFEFO, setSeriesFEFO] = useState(initialState3)
+    //variables pruebas poker
+    const [amountNumsRepeat, setAmountNumsRepeat] = useState(amountRepeatsNum)
+    const [poker, setPoker] = useState(initialStatePoker)
+    const [xcalcPoker, setXCalcPoker] = useState(0)
+    const [xcritPoker, setXCritPoker] = useState(2.195)
 
     const saveRange = (key) => {
         console.log("vea la key-->", key)
@@ -443,14 +478,14 @@ function Algorithm1() {
     const getTestSeries = () => {
         let total = 0
         let result = 0
-        let fe = (codes / 2)/25
+        let fe = (codes / 2) / 25
         Object.keys(series).map((key1) => {
             Object.keys(series).map((key2) => {
                 result = (Math.pow(fe - series[key1][key2], 2) / fe).toFixed(2)
                 if (series[key1][key2] !== undefined) {
                     console.log(series[key1][key2], result)
                     setSeriesFEFO([...seriesFEFO, seriesFEFO[key1][key2] = result])
-                    
+
                 }
                 total += parseFloat(result)
 
@@ -460,6 +495,95 @@ function Algorithm1() {
         setResultXcalc(total.toFixed(2))
         console.log("resultado total-->", total.toFixed(2), fe)
     }
+    // Estas funciones son para la prueba de poker
+    const cleanNumsRepeat = () => {
+        for (let i = 0; i < amountNumsRepeat.length; i++) {
+            setAmountNumsRepeat([...amountNumsRepeat, amountNumsRepeat[i] = 0])
+        }
+    }
+    const calculateFE = () => {
+        let resultado = 0
+        Object.keys(poker).map((key) => {
+            console.log("JEJEJEJEJE", poker[key][1])
+            resultado = (poker[key][1] * codes).toFixed(3)
+            setPoker([...poker, poker[key][2] = resultado])
+            
+        })
+        
+    }
+    const calculateFE_FO = () => {
+        let resultado = 0
+        let fe = 0
+        let xcalculado = 0
+
+        Object.keys(poker).map((key) => {
+            console.log("JEJEJEJEJE", poker[key][1])
+            fe = poker[key][2]
+            resultado = Math.pow((fe - poker[key][0]), 2) / fe
+            setPoker([...poker, poker[key][3] = resultado.toFixed(3)])
+
+            xcalculado += resultado
+        })
+        console.log("calculadooo--<", xcalculado)
+
+        setXCalcPoker(xcalculado.toFixed(3))
+    }
+    const verifyAmountNums = (num) => {
+        console.log("vea el numero-->", num, num.length)
+        let position = 0
+
+        let par = 0
+        let trecilla = 0
+        let PK = 0
+        let TD = 0
+        for (let i = 0; i < num.length; i++) {
+            position = num[i]
+            console.log("hey position-->", position)
+            setAmountNumsRepeat([...amountNumsRepeat, amountNumsRepeat[position] += 1])
+
+        }
+        console.log("veaa esteee......>", amountNumsRepeat)
+
+        for (let i = 0; i < amountNumsRepeat.length; i++) {
+            console.log("cantidad-->", amountNumsRepeat[i])
+            if (amountNumsRepeat[i] == 2) {
+                par += 1
+            } else if (amountNumsRepeat[i] == 3) {
+                trecilla += 1
+            } else if (amountNumsRepeat[i] == 4) {
+                PK += 1
+            }
+        }
+
+        if (par == 0 && trecilla == 0 && PK == 0) {
+            setPoker([...poker, poker[4][0] += 1])
+        }
+        if (par !== 0) {
+            if (par == 1) {
+                setPoker([...poker, poker[0][0] += 1])
+            } else if (par == 2) {
+                setPoker([...poker, poker[1][0] += 1])
+            }
+        }
+        if (trecilla !== 0) {
+            setPoker([...poker, poker[2][0] += 1])
+        }
+        if (PK !== 0) {
+            setPoker([...poker, poker[3][0] += 1])
+        }
+        console.log(par, trecilla, PK, TD, poker)
+    }
+
+    const separate = async () => {
+        calculateFE()
+        for (let i = 0; i < codes; i++) {
+            verifyAmountNums((rows[i].rn).slice(2, 6))
+            cleanNumsRepeat()
+        }
+        calculateFE_FO()
+    }
+    // Hasta aqui prueba de poker
+
     const generarCodigos = (a, c, m, semilla) => {
         let ultimo = semilla
         let par = 0
@@ -467,19 +591,19 @@ function Algorithm1() {
         for (let i = 1; i < codes + 1; i++) {
             if (i == 1) {
                 // console.log("primera vez", ultimo)
-                rows.push(createData(i, ultimo)) 
+                rows.push(createData(i, ultimo, (ultimo / m).toFixed(4)))
                 // saveRange(periodo.toFixed(1))
                 saveRange((ultimo / m))
                 // console.log("periodo primera-->",(ultimo/m).toFixed(1))
             } else {
                 // console.log("ultimo---<", ultimo,a,c,m,(a*ultimo+ c)%m,m,pseudoAleatorio(a, c, m, ultimo))
                 ultimo = pseudoAleatorio(a, c, m, ultimo)
-                rows.push(createData(i, ultimo))
+                rows.push(createData(i, ultimo, (ultimo / m).toFixed(4)))
                 // console.log(ultimo, ".----",(ultimo/m).toFixed(1))
                 // saveRange(periodo.toFixed(1))
                 saveRange((ultimo / m))
             }
-            
+
             //logica para coger pares
             if (par == 0) {
                 dato = ultimo
@@ -497,7 +621,7 @@ function Algorithm1() {
                 // console.log("datos -->", dato, ultimo)
             }
         }
-        setFE((codes / 2)/25)
+        setFE((codes / 2) / 25)
         calculateChi()
         calculateFOA()
         calculatePOA()
@@ -505,6 +629,7 @@ function Algorithm1() {
         calculatePEA_POA()
         generarCorridas()
         getTestSeries()
+        separate()
         setGenerateBool(true)
 
     }
@@ -597,9 +722,10 @@ function Algorithm1() {
                             setCodes("")
                             setDisabled(false)
                             setDatos(initialState)
-                            console.log(datos)
-                            console.log(series)
-                            console.log(seriesFEFO)
+                            // console.log(datos)
+                            // console.log(series)
+                            // console.log(seriesFEFO)
+                            console.log(amountNumsRepeat)
 
                         }}>
                         Clean
@@ -1098,7 +1224,7 @@ function Algorithm1() {
                             <Paper className={classes.paper}>Degrees of freedom</Paper>
                             <br />
                             <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
-                                {Math.pow(series.length-1,2)-1}
+                                {Math.pow(series.length - 1, 2) - 1}
                             </h2>
 
                         </Grid>
@@ -1206,8 +1332,14 @@ function Algorithm1() {
                                 }
 
                             </Grid>
+                            <Divider orientation="vertical" flexItem />
+                            <Divider orientation="vertical" flexItem />
+                            <Divider orientation="vertical" flexItem />
+                            <Divider orientation="vertical" flexItem />
+                            <Divider orientation="vertical" flexItem />
+
                             <Grid item xs={2} className={classes.grid}>
-                                
+
                                 <br />
                                 <Paper className={classes.paper}>X²crit</Paper>
                                 <br />
@@ -1221,8 +1353,157 @@ function Algorithm1() {
                                 <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
                                     {resultXcalc}
                                 </h2>
+
+                                { (resultXcalc < 36.42  )?
+                                <h2 style={{ marginTop: 30 }}>
+                                   The hypothesis that the data have a two-dimensional uniform distribution is accepted.
+                                </h2>
+                                : <h2 style={{ padding: 7, margin: 20 }}>
+                                    The hypothesis that the data have a two-dimensional uniform distribution is not accepted.
+                                </h2>
+                            }
                             </Grid>
                         </Grid>
+                    </Grid>
+
+                    {/*Prueba Independencia POKER*/}
+                    <Paper className={classes.titleAlgorithm5}>Independence test Poker</Paper>
+                    <Grid container spacing={2} className={classes.containerResults}>
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper style={{ paddingTop: 32, background: "transparent" }}></Paper>
+                            {<>
+
+                                <h2 className={classes.paper2}>1P</h2>
+                                <h2 className={classes.paper2}>2P</h2>
+                                <h2 className={classes.paper2}>T</h2>
+                                <h2 className={classes.paper2}>PK</h2>
+                                <h2 className={classes.paper2}>TD</h2>
+                            </>
+                            }
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>FO</Paper>
+                            {
+                                Object.keys(poker).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{poker[key][0]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                        </Grid>
+
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>Probability</Paper>
+
+                            {
+                                Object.keys(poker).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{poker[key][1]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={1.5} className={classes.grid}>
+                            <Paper className={classes.paper}>FE</Paper>
+                            {
+                                Object.keys(poker).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{poker[key][2]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                            <br />
+                            <Divider />
+                            <h2 style={{ background: "#5947ff", padding: 7, marginTop: 0 }}>
+                                X²calc
+                            </h2>
+                            <Divider />
+                        </Grid>
+
+                        <Divider orientation="vertical" flexItem />
+                        <Grid item xs={2} className={classes.grid}>
+                            <Paper className={classes.paper}>(FE-FO)² / FE</Paper>
+                            {
+                                Object.keys(poker).map(key => {
+                                    if (key <= 4) {
+                                        return (
+                                            <>
+                                                <h2>{poker[key][3]}</h2>
+                                                <Divider />
+                                            </>
+                                        )
+                                    }
+
+                                })
+                            }
+                            <br />
+                            <Divider />
+                            <h2 style={{ background: "#5947ff", padding: 7, marginTop: 0 }}>
+                                {xcalcPoker}
+                            </h2>
+                            <Divider />
+                        </Grid>
+                        <Divider orientation="vertical" flexItem />
+
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
+
+                        <Grid item xs={2} className={classes.grid}>
+                            <Paper className={classes.paper}>X²crit</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {xcritPoker}
+                            </h2>
+
+                            <br />
+                            <Paper className={classes.paper}>Confidence level α</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                0,70
+                            </h2>
+
+                            <br />
+                            <Paper className={classes.paper}>Degrees of freedom</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                {(poker.length - 2)}
+                            </h2>
+
+                            { (xcalcPoker < xcritPoker)?
+                                <h2 style={{ marginTop: 30 }}>
+                                    The sequence of numbers passes the test
+                                </h2>
+                                : <h2 style={{ padding: 7, margin: 20 }}>
+                                    The sequence of numbers does not pass the test
+                                </h2>
+                            }
+                        </Grid>
+
                     </Grid>
 
                     {/* Esta es la tabla con los codigos */}

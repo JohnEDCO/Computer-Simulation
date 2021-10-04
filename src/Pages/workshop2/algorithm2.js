@@ -154,9 +154,11 @@ function Algorithm2() {
         let q = Math.floor(m / a)
         let r = (m % a)
 
-        let op1 = a * (semilla % q) - r * (semilla / q)
-        let op2 = a * (semilla % q) - r * (semilla / q) + m
+        let op1 = a * (semilla % q) - r * Math.trunc((semilla / q))
+        let op2 = a * (semilla % q) - r * Math.trunc((semilla / q)) + m
         let op3 = (a * semilla) % m
+
+        console.log("Valores ops..>",op1, op2, op3)
 
         return op1 < 0
             ? op2 < 0
