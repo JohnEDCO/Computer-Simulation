@@ -496,22 +496,22 @@ function Algorithm1() {
         console.log("resultado total-->", total.toFixed(2), fe)
     }
     // Estas funciones son para la prueba de poker
-    const cleanNumsRepeat = () => {
+    const cleanNumsRepeatPoker = () => {
         for (let i = 0; i < amountNumsRepeat.length; i++) {
             setAmountNumsRepeat([...amountNumsRepeat, amountNumsRepeat[i] = 0])
         }
     }
-    const calculateFE = () => {
+    const calculateFEPoker = () => {
         let resultado = 0
         Object.keys(poker).map((key) => {
             console.log("JEJEJEJEJE", poker[key][1])
             resultado = (poker[key][1] * codes).toFixed(3)
             setPoker([...poker, poker[key][2] = resultado])
-            
+
         })
-        
+
     }
-    const calculateFE_FO = () => {
+    const calculateFE_FO_Poker = () => {
         let resultado = 0
         let fe = 0
         let xcalculado = 0
@@ -528,7 +528,7 @@ function Algorithm1() {
 
         setXCalcPoker(xcalculado.toFixed(3))
     }
-    const verifyAmountNums = (num) => {
+    const verifyAmountNumsPoker = (num) => {
         console.log("vea el numero-->", num, num.length)
         let position = 0
 
@@ -573,14 +573,13 @@ function Algorithm1() {
         }
         console.log(par, trecilla, PK, TD, poker)
     }
-
     const separate = async () => {
-        calculateFE()
+        calculateFEPoker()
         for (let i = 0; i < codes; i++) {
-            verifyAmountNums((rows[i].rn).slice(2, 6))
-            cleanNumsRepeat()
+            verifyAmountNumsPoker((rows[i].rn).slice(2, 6))
+            cleanNumsRepeatPoker()
         }
-        calculateFE_FO()
+        calculateFE_FO_Poker()
     }
     // Hasta aqui prueba de poker
 
@@ -1072,6 +1071,13 @@ function Algorithm1() {
                             </h2>
 
                             <br />
+                            <Paper className={classes.paper}>Z0,025</Paper>
+                            <br />
+                            <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
+                                ± {1.96}
+                            </h2>
+
+                            <br />
                             <Paper className={classes.paper}>Zabs</Paper>
                             <br />
                             <h2 style={{ background: "gray", padding: 7, margin: 0 }}>
@@ -1354,14 +1360,14 @@ function Algorithm1() {
                                     {resultXcalc}
                                 </h2>
 
-                                { (resultXcalc < 36.42  )?
-                                <h2 style={{ marginTop: 30 }}>
-                                   The hypothesis that the data have a two-dimensional uniform distribution is accepted.
-                                </h2>
-                                : <h2 style={{ padding: 7, margin: 20 }}>
-                                    The hypothesis that the data have a two-dimensional uniform distribution is not accepted.
-                                </h2>
-                            }
+                                {(resultXcalc < 36.42) ?
+                                    <h2 style={{ marginTop: 30 }}>
+                                        The hypothesis that the data have a two-dimensional uniform distribution is accepted.
+                                    </h2>
+                                    : <h2 style={{ padding: 7, margin: 20 }}>
+                                        The hypothesis that the data have a two-dimensional uniform distribution is not accepted.
+                                    </h2>
+                                }
                             </Grid>
                         </Grid>
                     </Grid>
@@ -1494,7 +1500,7 @@ function Algorithm1() {
                                 {(poker.length - 2)}
                             </h2>
 
-                            { (xcalcPoker < xcritPoker)?
+                            {(xcalcPoker < xcritPoker) ?
                                 <h2 style={{ marginTop: 30 }}>
                                     The sequence of numbers passes the test
                                 </h2>
